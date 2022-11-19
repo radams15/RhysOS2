@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CLionExternalBuildManager">
+    <target id="9ad6da01-415f-4da4-8bd9-d1d66eadc9fb" name="Python build" defaultType="TOOL">
+      <configuration id="a70ed6b0-adac-4532-9312-f4cdf7264922" name="Python build" toolchainName="Default">
+        <build type="TOOL">
+          <tool actionId="Tool_External Tools_python build.py" />
+        </build>
+      </configuration>
+    </target>
+  </component>
+</project>

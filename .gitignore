@@ -1,0 +1,7 @@
+Tools/
+cross/*
+build/
+*.bin
+*.o
+/cmake-build-debug/
+/cross/*

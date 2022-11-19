@@ -1,0 +1,9 @@
+<toolSet name="External Tools">
+  <tool name="python build.py" description="python" showInMainMenu="false" showInEditor="false" showInProject="false" showInSearchPopup="false" disabled="false" useConsole="true" showConsoleOnStdOut="false" showConsoleOnStdErr="false" synchronizeAfterRun="true">
+    <exec>
+      <option name="COMMAND" value="python3" />
+      <option name="PARAMETERS" value="build.py" />
+      <option name="WORKING_DIRECTORY" value="/mnt/share/scripts/projects/RhysOS6" />
+    </exec>
+  </tool>
+</toolSet>
