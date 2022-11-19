@@ -11,7 +11,7 @@ set(NASM_SOURCES
 set_source_files_properties(${NASM_SOURCES} PROPERTIES LANGUAGE ASM_NASM)
 
 set(C_SOURCES
-       src/main.cpp)
+       src/main.cpp src/x86/IO/TTY.cpp include/IO/TTY.h include/Types.h include/VGA.h include/Math.cpp include/Math.h src/String.cpp include/String.h)
 
 add_executable(Kernel ${NASM_SOURCES} ${ASM_SOURCES} ${C_SOURCES})
 

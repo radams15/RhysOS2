@@ -167,7 +167,7 @@ if __name__ == "__main__":
     make_dirs()
     
     objs = comp_kernel()
-    objs += comp_fonts()
+    #objs += comp_fonts()
     link_kernel(objs)
 
     make_iso()
