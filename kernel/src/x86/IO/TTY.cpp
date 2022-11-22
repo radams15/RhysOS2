@@ -10,7 +10,12 @@
 
 #define FORMAT_MARK '%'
 
-TTY::TTY(vga_color fg, vga_color bg) {
+uint8 TTY::colour;
+uint8 TTY::col;
+uint8 TTY::row;
+uint16* TTY::buf;
+
+void TTY::init(vga_color fg, vga_color bg) {
     buf = (uint16*) VGA_MEM_START;
 
     row = 0;
@@ -46,7 +51,6 @@ void TTY::setChar(uint16 x, uint16 y, uint8 c) {
 void TTY::setChar(uint16 pos, uint8 c) {
     buf[pos] = VGA_CHR(c, colour);
 }
-
 
 uint16 TTY::getBufIndex(uint8 x, uint8 y) {
     return (y*VGA_WIDTH + x);

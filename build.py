@@ -6,6 +6,9 @@ import datetime
 from glob import glob
 from sys import platform
 
+from multiprocessing.pool import ThreadPool as Pool
+from multiprocessing import Process
+
 
 class Colour:
     HEADER = '\033[95m'
@@ -57,11 +60,11 @@ MEMORY = 128
 def run_cleanly(args, tabs=0, cwd=root):
     res = subprocess.run(args, shell=True, cwd=cwd, stdout=subprocess.PIPE)#, stderr=subprocess.PIPE)
 
-    if res.returncode not in [0]:
-        #print(("\t"*tabs) + f"{Colour.FAIL}{res.stderr.decode()}{Colour.ENDC}")
-        exit(1)
-
     print(("\t"*tabs) + f"{Colour.OKBLUE}[{datetime.datetime.now().strftime('%S:%M:%H')}]{Colour.WARNING}\t{args}{Colour.ENDC}\t=>\t[{Colour.OKGREEN+'SUCCESS' if res.returncode == 0 else Colour.FAIL+'FAIL'}]{Colour.ENDC}", flush=True)
+
+
+    if res.returncode not in [0]:
+        exit(1)
 
 
 def clean():
@@ -94,37 +97,43 @@ def comp_kernel():
 
     files = list(set(asm_files + c_files))
 
-    print("*** Kernel Compile - NASM ***")
-
-    for nasm_file in glob("kernel/src/**/*.nasm", recursive=True):
+    def compile_nasm_file(nasm_file):
         obj_file = (splitext(nasm_file)[0]+".o").replace("kernel/src", "build/kernel")
         obj_files.append(obj_file)
 
         command = f"nasm -f elf32 -o {obj_file} {nasm_file} "
 
         run_cleanly(command, tabs=1)
-    print("\n")
 
-
-    print("*** Kernel Compile - C ***")
-
-    for c_file in files:
+    def compile_c_file(c_file):
         obj_file = (splitext(c_file)[0]+".o").replace("kernel/src", "build/kernel")
         obj_files.append(obj_file)
-        
+
         command = f"{CC} -std={STD} -ffreestanding -Wall -Wextra -c {c_file} -o {obj_file} -I kernel/include/"
-        
+
         run_cleanly(command, tabs=1)
 
-    print("*** Kernel Compile - C++ ***")
-
-    for cpp_file in cpp_files:
+    def compile_cpp_file(cpp_file):
         obj_file = (splitext(cpp_file)[0]+".o").replace("kernel/src", "build/kernel")
         obj_files.append(obj_file)
 
         command = f"{CXX} -ffreestanding -Wall -Wextra  -c {cpp_file} -o {obj_file} -I kernel/include/ -fno-exceptions -fno-rtti"
 
         run_cleanly(command, tabs=1)
+
+    pool = Pool(20)
+
+    print("\n*** Kernel Compile - NASM ***")
+
+    pool.map(compile_nasm_file, glob("kernel/src/**/*.nasm", recursive=True))
+
+    print("\n*** Kernel Compile - C ***")
+
+    pool.map(compile_c_file, files)
+
+    print("\n*** Kernel Compile - C++ ***")
+
+    pool.map(compile_cpp_file, cpp_files)
 
 
     print("\n")

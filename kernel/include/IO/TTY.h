@@ -12,30 +12,30 @@
 
 class TTY {
 private:
-    uint8 colour;
+    static uint8 colour;
 
-    uint8 col;
-    uint8 row;
-    uint16* buf;
+    static uint8 col;
+    static uint8 row;
+    static uint16* buf;
 
-    uint16 getBufIndex(uint8 x, uint8 y);
+    static uint16 getBufIndex(uint8 x, uint8 y);
 
-    void setChar(uint16 x, uint16 y, uint8 c);
-    void setChar(uint16 pos, uint8 c);
+    static void setChar(uint16 x, uint16 y, uint8 c);
+    static void setChar(uint16 pos, uint8 c);
 
-    void print_args(const char* text, va_list args);
+    static void print_args(const char* text, va_list args);
 
 public:
-    TTY(vga_color fg, vga_color bg);
-    void setColour(vga_color fg, vga_color bg);
+    static void init(vga_color fg, vga_color bg);
+    static void setColour(vga_color fg, vga_color bg);
 
-    void clear();
-    void putc(uint8 c);
-    void puti(uint16 num);
-    void printk(const char* text, ...);
+    static void clear();
+    static void putc(uint8 c);
+    static void puti(uint16 num);
+    static void printk(const char* text, ...);
 
-    void putCursor(uint16 x, uint16 y);
-    void scroll();
+    static void putCursor(uint16 x, uint16 y);
+    static void scroll();
 };
 
 

@@ -1,18 +1,15 @@
 #include "IO/TTY.h"
+#include "Memory/GDT.h"
+#include "Interrupts/IDT.h"
 
 extern "C" int kmain(){
-    TTY tty(VGA_COLOUR_BLACK, VGA_COLOUR_WHITE);
-
-    /*for(int i=0 ; i<100 ; i++) {
-        tty.printk("Hello world * %d\n", i);
-        tty.scroll();
-    }*/
+    GDT::init();
+    IDT::init();
 
 
-    tty.printk("Hello world\n");
+    TTY::init(VGA_COLOUR_BLACK, VGA_COLOUR_WHITE);
 
-    //tty.putCursor(5, 0);
-
+    TTY::printk("Boot Complete!");
 
     for(;;){
 
