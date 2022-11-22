@@ -34,6 +34,9 @@ public:
     static void setGate(uint8 num, uint32 base, uint16 sel, uint8 flags);
 
     static void flush(uint32 ptr);
+
+    static void enable();
+    static void disable();
 };
 
 extern "C" void  isr0();

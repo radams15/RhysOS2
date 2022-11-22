@@ -107,3 +107,11 @@ void IDT::setGate(uint8 num, uint32 base, uint16 sel, uint8 flags) {
 void IDT::flush(uint32 ptr) {
     idt_flush(ptr);
 }
+
+void IDT::enable() {
+    asm volatile("sti");
+}
+
+void IDT::disable() {
+    asm volatile("cli");
+}

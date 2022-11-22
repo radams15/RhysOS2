@@ -57,6 +57,10 @@ uint16 TTY::getBufIndex(uint8 x, uint8 y) {
 }
 
 void TTY::putc(uint8 c) {
+    if(col >= VGA_HEIGHT-1){
+        scroll();
+    }
+
     switch(c){
         case '\n':
             row++;
