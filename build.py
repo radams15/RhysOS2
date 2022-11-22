@@ -38,8 +38,8 @@ if platform == "darwin":
     GRUBISO = "grub-file"
     OBJCOPY = 'i686-elf-objcopy'
 else:
-    CC = f"{root}/cross/{platform}/bin/i686-elf-gcc"
-    CXX = f"{root}/cross/{platform}/bin/i686-elf-g++"
+    CC = f"ccache {root}/cross/{platform}/bin/i686-elf-gcc"
+    CXX = f"ccache {root}/cross/{platform}/bin/i686-elf-g++"
     AS = f"{root}/cross/{platform}/bin/i686-elf-as"
     GRUB = "grub2-mkrescue"
     GRUBISO = "grub2-file"

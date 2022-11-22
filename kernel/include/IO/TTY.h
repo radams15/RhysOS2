@@ -14,13 +14,14 @@ class TTY {
 private:
     uint8 colour;
 
-    uint16 col;
-    uint16 row;
+    uint8 col;
+    uint8 row;
     uint16* buf;
 
-    uint16 getBufIndex(uint16 x, uint16 y);
+    uint16 getBufIndex(uint8 x, uint8 y);
 
-    void setChar(int x, int y, char c);
+    void setChar(uint16 x, uint16 y, uint8 c);
+    void setChar(uint16 pos, uint8 c);
 
     void print_args(const char* text, va_list args);
 
@@ -29,9 +30,12 @@ public:
     void setColour(vga_color fg, vga_color bg);
 
     void clear();
-    void putc(char c);
+    void putc(uint8 c);
     void puti(uint16 num);
     void printk(const char* text, ...);
+
+    void putCursor(uint16 x, uint16 y);
+    void scroll();
 };
 
 

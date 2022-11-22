@@ -6,12 +6,12 @@
 #define RHYSOS_TYPES_H
 
 #define uint8 unsigned char
-#define uint16 unsigned int
-#define uint32 unsigned long
+#define uint16 unsigned short
+#define uint32 unsigned int
 
 #define int8 char
-#define int16 int
-#define int32 long
+#define int16 short
+#define int32 int
 
 #define NULL 0
 #define FALSE 0

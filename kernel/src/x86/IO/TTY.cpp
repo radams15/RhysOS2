@@ -6,16 +6,19 @@
 
 #include "Math.h"
 #include "String.h"
+#include "IO/Ports.h"
 
 #define FORMAT_MARK '%'
 
 TTY::TTY(vga_color fg, vga_color bg) {
+    buf = (uint16*) VGA_MEM_START;
+
     row = 0;
     col = 0;
 
     setColour(fg, bg);
 
-    buf = (uint16*) VGA_MEM_START;
+    clear();
 }
 
 void TTY::setColour(vga_color fg, vga_color bg) {
@@ -26,25 +29,30 @@ void TTY::clear() {
     col = 0;
     row = 0;
 
-    for(uint32 i=0 ; i<(VGA_HEIGHT*VGA_WIDTH) ; i++){
-        putc(NULL);
+    for(uint16 i=0 ; i<(VGA_HEIGHT*VGA_WIDTH) ; i++){
+        setChar(i, ' ');
     }
 
     col = 0;
     row = 0;
 }
 
-void TTY::setChar(int x, int y, char c) {
+void TTY::setChar(uint16 x, uint16 y, uint8 c) {
     uint16 index = getBufIndex(x, y);
 
-    buf[index] = VGA_CHR(c, colour);
+    setChar(index, c);
 }
 
-uint16 TTY::getBufIndex(unsigned int x, unsigned int y) {
-    return y*VGA_WIDTH + x;
+void TTY::setChar(uint16 pos, uint8 c) {
+    buf[pos] = VGA_CHR(c, colour);
 }
 
-void TTY::putc(char c) {
+
+uint16 TTY::getBufIndex(uint8 x, uint8 y) {
+    return (y*VGA_WIDTH + x);
+}
+
+void TTY::putc(uint8 c) {
     switch(c){
         case '\n':
             row++;
@@ -129,9 +137,9 @@ void TTY::print_args(const char *text, va_list args) {
 
                 case 'x': // hex int
                     printk("");
-                    char buf[32];
-                    hex_str(va_arg(args, uint32), buf);
-                    printk(buf);
+                    char hex_buf[32];
+                    hex_str(va_arg(args, uint32), hex_buf);
+                    printk(hex_buf);
                     break;
 
                 case FORMAT_MARK:
@@ -148,4 +156,28 @@ void TTY::print_args(const char *text, va_list args) {
             putc(text[i]);
         }
     }
+}
+
+void TTY::putCursor(uint16 x, uint16 y) {
+    col=y;
+    row=x;
+
+    uint16 loc = getBufIndex(x, y);
+
+    Ports::outb(0x3D4, 14);
+    Ports::outb(0x3D5, loc >> 8);
+    Ports::outb(0x3D4, 15);
+    Ports::outb(0x3D5, loc);
+}
+
+void TTY::scroll() {
+    for(uint32 i=0 ; i<((VGA_HEIGHT-1)*VGA_WIDTH) ; i++){
+        buf[i] = buf[i+VGA_WIDTH];
+    }
+
+    for(uint32 i=((VGA_HEIGHT-1)*VGA_WIDTH); i<(VGA_HEIGHT*VGA_WIDTH) ; i++){
+        buf[i] = ' ';
+    }
+
+    col--;
 }

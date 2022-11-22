@@ -32,6 +32,6 @@ enum vga_color {
 };
 
 #define VGA_COLOUR(fg, bg) (((fg) | (bg)) << 4)
-#define VGA_CHR(uc, colour) ((uint16) (uc) | (uint16) (colour) << 8)
+#define VGA_CHR(uc, colour) ((uint8) (uc) | (uint8) (colour) << 8)
 
 #endif //RHYSOS_VGA_H
