@@ -2,6 +2,7 @@
 #include "Memory/GDT.h"
 #include "Interrupts/IDT.h"
 #include "Interrupts/Clock.h"
+#include "Panic.h"
 
 extern "C" int kmain(){
     GDT::init();
@@ -15,7 +16,7 @@ extern "C" int kmain(){
 
     Clock::init(60);
 
-    Clock::sleep(5);
+    Clock::sleep(1);
 
     TTY::printk("Done!");
 

@@ -27,3 +27,8 @@ _start:
 	push ebx
 	cli
 	call kmain
+
+extern halt
+
+halt:
+	jmp halt;
