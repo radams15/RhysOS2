@@ -4,6 +4,7 @@
 #include "Interrupts/Clock.h"
 #include "Panic.h"
 #include "Memory/Paging.h"
+#include "libc/List.h"
 
 bool init(){
     GDT::init();
@@ -12,8 +13,6 @@ bool init(){
     TTY::init(VGA_COLOUR_BLACK, VGA_COLOUR_WHITE);
 
     IDT::enable();
-
-    Paging::init();
 
     Clock::init();
 
@@ -29,6 +28,19 @@ extern "C" int kmain(){
     }
 
     TTY::printk("Boot Complete!\n");
+
+    List<int> a(10, (List<int>::Comparator) *[](int a, int b){
+        return (int8) a>b;
+    });
+
+    a.insert(1);
+    a.insert(2);
+
+    TTY::printk("0: %d\n", a.get(0));
+    TTY::printk("1: %d\n", a.get(1));
+    TTY::printk("2: %d\n", a.get(2));
+
+    Paging::init();
 
     for(;;){
 
