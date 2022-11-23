@@ -4,20 +4,19 @@
 
 #include "Interrupts/Clock.h"
 #include "Interrupts/ISR.h"
-#include "IO/TTY.h"
 #include "IO/Ports.h"
 
 uint32 Clock::tick = 0;
 uint32 Clock::frequency = 0;
 
-extern "C" void timer_callback(Registers registers){
+extern "C" void timer_callback([[maybe_unused]] Registers registers){
     Clock::clockTick();
 }
 
-void Clock::init(uint32 frequency) {
+void Clock::init(uint32 freq) {
     ISR::register_handler(IRQ0, timer_callback);
 
-    Clock::frequency = frequency;
+    Clock::frequency = freq;
 
     uint32 divisor = 1193180 / Clock::frequency;
 
@@ -43,4 +42,8 @@ void Clock::sleep(uint32 secs) {
     while(tick < target){
         // Wait
     }
+}
+
+uint32 Clock::getFrequency() {
+    return frequency;
 }

@@ -5,7 +5,7 @@
 #include "Interrupts/ISR.h"
 #include "IO/TTY.h"
 
-IsrHandler ISR::handlers[256];
+IsrHandler ISR::handlers[256] = {NULL};
 
 extern "C" void isr_handler(Registers regs) {
     ISR::handle(regs);
@@ -16,7 +16,7 @@ void ISR::register_handler(unsigned char isr_num, IsrHandler handler) {
 }
 
 void ISR::handle(Registers registers) {
-    if(handlers[registers.int_no] != 0) {
+    if(handlers[registers.int_no] != NULL) {
         handlers[registers.int_no](registers);
     }else{
         TTY::printk("Unhandled interrupt: %d\n", registers.int_no);

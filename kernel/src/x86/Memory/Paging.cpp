@@ -21,7 +21,7 @@ void Paging::init() {
     memset((uint8 *) kernelDirectory, 0, sizeof(PageDirectory));
     currentDirectory = kernelDirectory;
 
-    for(int i=0 ; i< Memory::getPlacementAddress() ; i += 0x1000){
+    for(uint32 i=0 ; i<Memory::getPlacementAddress() ; i += 0x1000){
         PageFrame::alloc(getPage(i, 1, kernelDirectory), 0, 0);
     }
 
@@ -31,15 +31,52 @@ void Paging::init() {
 }
 
 void Paging::switchDirectory(PageDirectory *newDir) {
+    currentDirectory = newDir;
 
+    asm volatile("mov %0, %%cr3" :: "r"(&currentDirectory->physicalTables)); // Pass physical addr of page table.
+
+    uint32 cr0;
+    asm volatile("mov %%cr0, %0": "=r"(cr0));
+    cr0 |= 0x80000000; // Set paging bit.
+    asm volatile("mov %0, %%cr0":: "r"(cr0));
 }
 
 Page* Paging::getPage(unsigned int addr, int create, PageDirectory *directory) {
+    addr /= 0x1000; // Addr => index
 
+    uint32 idx = addr/1024; // Location of page table with the index.
+
+    if(directory->tables[idx]){
+        return & directory[idx].tables[idx]->pages[addr%1024];
+    }
+
+    if(create){
+        uint32 temp;
+
+        directory->tables[idx] = (PageTable*) Memory::kmalloc(sizeof(PageTable), true, &temp);
+        memset((uint8*) directory->tables[idx], 0, 0x1000);
+        directory->physicalTables[idx] = temp|0x7; // Set present, rw and us
+
+        return & directory[idx].tables[idx]->pages[addr%1024];
+    }
+
+    return NULL;
 }
 
 void Paging::fault(Registers r) {
+    uint32 faultAddr;
+    asm volatile("mov %%cr2, %0" : "=r"(faultAddr));
 
+    TTY::printk("Page fault at %d:\n\tpresent? %d\n\tRO: %d\n\tUser mode: %d\n\tReserved: %d",
+                faultAddr,
+                !(r.err_code&0x1),
+                r.err_code&0x2,
+                r.err_code&0x4,
+                r.err_code&0x8,
+                r.err_code&0x10
+    );
+
+    halt();
 }
 
 
@@ -77,7 +114,7 @@ uint32 PageFrame::test(unsigned int addr) {
     return (frames[idx] & (0x1 << off));
 }
 
-uint32 PageFrame::first() {
+int32 PageFrame::first() {
     uint32 i, j;
     for (i = 0; i < indexFromBit(length); i++) {
         if (frames[i] != 0xFFFFFFFF) // nothing free, exit early.
@@ -108,7 +145,7 @@ void PageFrame::alloc(Page *page, bool isKernel, bool isWriteable) {
         return;
     }
 
-    uint32 idx = first();
+    int32 idx = first();
 
     if (idx == -1) {
         PANIC("No free frames!");

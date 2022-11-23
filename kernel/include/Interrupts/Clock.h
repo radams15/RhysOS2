@@ -14,11 +14,13 @@ private:
     static uint32 frequency;
 
 public:
-    static void init(uint32 frequency);
+    static void init(uint32 freq=60);
 
     static void clockTick();
 
     static void sleep(uint32 secs);
+
+    static uint32 getFrequency();
 };
 
 

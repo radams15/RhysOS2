@@ -57,7 +57,7 @@ public:
     static void set(uint32 addr);
     static void clear(uint32 addr);
     static uint32 test(uint32 addr);
-    static uint32 first();
+    static int32 first();
 
     static void alloc(Page* page, bool isKernel, bool isWriteable);
     static void free(Page* page);
