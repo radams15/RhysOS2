@@ -20,6 +20,8 @@ public:
     static uint32 kmalloc(uint32 size, bool align, uint32 *physical);
 
     static uint32 getPlacementAddress();
+
+    static void kfree(uint32 ptr);
 };
 
 #endif //RHYSOS_MALLOC_H

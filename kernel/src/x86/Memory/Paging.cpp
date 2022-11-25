@@ -6,6 +6,7 @@
 #include "Memory/Paging.h"
 #include "Panic.h"
 #include "Memory/malloc.h"
+#include "Memory/Heap.h"
 
 PageDirectory *Paging::kernelDirectory = NULL;
 PageDirectory *Paging::currentDirectory = NULL;
@@ -21,13 +22,23 @@ void Paging::init() {
     memset((uint8 *) kernelDirectory, 0, sizeof(PageDirectory));
     currentDirectory = kernelDirectory;
 
-    for(uint32 i=0 ; i<Memory::getPlacementAddress() ; i += 0x1000){
-        PageFrame::alloc(getPage(i, 1, kernelDirectory), 0, 0);
+    kernelDirectory = (PageDirectory*) Memory::kmalloc(sizeof(PageDirectory), TRUE);
+    memset((uint8*) kernelDirectory, 0, sizeof(PageDirectory));
+    currentDirectory = kernelDirectory;
+
+    for(int i=Heap::KHEAP_START ; i<Heap::KHEAP_START+Heap::KHEAP_INITIAL_SIZE ; i+=PAGE_SIZE){
+        getPage(i, TRUE, kernelDirectory);
+    }
+
+    for(uint32 i=0 ; i<Memory::getPlacementAddress() ; i += PAGE_SIZE){
+        PageFrame::alloc(getPage(i, TRUE, kernelDirectory), FALSE, FALSE);
     }
 
     ISR::register_handler(14, pageFaultHandler);
 
     switchDirectory(kernelDirectory);
+
+    Heap::setKheap(new Heap((uint32)Heap::KHEAP_START, (uint32) Heap::KHEAP_START+Heap::KHEAP_INITIAL_SIZE, (uint32) 0xCFFFF000, FALSE, FALSE));
 }
 
 void Paging::switchDirectory(PageDirectory *newDir) {
@@ -42,7 +53,7 @@ void Paging::switchDirectory(PageDirectory *newDir) {
 }
 
 Page* Paging::getPage(unsigned int addr, int create, PageDirectory *directory) {
-    addr /= 0x1000; // Addr => index
+    addr /= PAGE_SIZE; // Addr => index
 
     uint32 idx = addr/1024; // Location of page table with the index.
 
@@ -54,7 +65,7 @@ Page* Paging::getPage(unsigned int addr, int create, PageDirectory *directory) {
         uint32 temp;
 
         directory->tables[idx] = (PageTable*) Memory::kmalloc(sizeof(PageTable), true, &temp);
-        memset((uint8*) directory->tables[idx], 0, 0x1000);
+        memset((uint8*) directory->tables[idx], 0, PAGE_SIZE);
         directory->physicalTables[idx] = temp|0x7; // Set present, rw and us
 
         return & directory[idx].tables[idx]->pages[addr%1024];
@@ -84,16 +95,16 @@ uint32 *PageFrame::frames = NULL;
 uint32 PageFrame::length = 0;
 
 void PageFrame::init() {
-    uint32 endPage = 0x1000000;
+    uint32 endPage = PAGE_SIZE;
 
-    length = endPage / 0x1000;
+    length = endPage / PAGE_SIZE;
     frames = (uint32 *) Memory::kmalloc(indexFromBit(length));
 
     memset((uint8 *) frames, 0, indexFromBit(length));
 }
 
 void PageFrame::set(unsigned int addr) {
-    uint32 frame = addr / 0x1000;
+    uint32 frame = addr / PAGE_SIZE;
     uint32 idx = indexFromBit(frame);
     uint32 off = offsetFromBit(frame);
 
@@ -101,14 +112,14 @@ void PageFrame::set(unsigned int addr) {
 }
 
 void PageFrame::clear(unsigned int addr) {
-    uint32 frame = addr / 0x1000;
+    uint32 frame = addr / PAGE_SIZE;
     uint32 idx = indexFromBit(frame);
     uint32 off = offsetFromBit(frame);
     frames[idx] &= ~(0x1 << off);
 }
 
 uint32 PageFrame::test(unsigned int addr) {
-    uint32 frame = addr / 0x1000;
+    uint32 frame = addr / PAGE_SIZE;
     uint32 idx = indexFromBit(frame);
     uint32 off = offsetFromBit(frame);
     return (frames[idx] & (0x1 << off));
@@ -151,7 +162,7 @@ void PageFrame::alloc(Page *page, bool isKernel, bool isWriteable) {
         PANIC("No free frames!");
     }
 
-    set(idx * 0x1000);
+    set(idx * PAGE_SIZE);
     page->present = TRUE;
     page->rw = isWriteable;
     page->user = !isKernel;

@@ -10,6 +10,8 @@
 
 #define PAGE_LEN 1024
 
+#define PAGE_SIZE 0x1000
+
 struct Page {
     uint32 present: 1;
     uint32 rw: 1;
@@ -40,6 +42,9 @@ public:
     static Page* getPage(uint32 addr, int create, PageDirectory* directory);
 
     static void fault(Registers r);
+
+    static inline PageDirectory* getKernelDirectory(){ return kernelDirectory; }
+    static inline PageDirectory* getCurrentDirectory(){ return currentDirectory; }
 };
 
 class PageFrame {
