@@ -29,7 +29,13 @@ extern "C" int kmain(){
 
     TTY::printk("Boot Complete!\n");
 
+    uint32 a = Memory::kmalloc(8);
+    TTY::printk("A: %x\n", a);
+
     Paging::init();
+
+    uint32 b = Memory::kmalloc(8);
+    TTY::printk("B: %x\n", b);
 
     for(;;){
 

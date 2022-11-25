@@ -22,15 +22,11 @@ void Paging::init() {
     memset((uint8 *) kernelDirectory, 0, sizeof(PageDirectory));
     currentDirectory = kernelDirectory;
 
-    kernelDirectory = (PageDirectory*) Memory::kmalloc(sizeof(PageDirectory), TRUE);
-    memset((uint8*) kernelDirectory, 0, sizeof(PageDirectory));
-    currentDirectory = kernelDirectory;
-
     for(int i=Heap::KHEAP_START ; i<Heap::KHEAP_START+Heap::KHEAP_INITIAL_SIZE ; i+=PAGE_SIZE){
         getPage(i, TRUE, kernelDirectory);
     }
 
-    for(uint32 i=0 ; i<Memory::getPlacementAddress() ; i += PAGE_SIZE){
+    for(uint32 i=0 ; i<Memory::getPlacementAddress()+PAGE_SIZE ; i += PAGE_SIZE){
         PageFrame::alloc(getPage(i, TRUE, kernelDirectory), FALSE, FALSE);
     }
 
@@ -39,6 +35,15 @@ void Paging::init() {
     switchDirectory(kernelDirectory);
 
     Heap::setKheap(new Heap((uint32)Heap::KHEAP_START, (uint32) Heap::KHEAP_START+Heap::KHEAP_INITIAL_SIZE, (uint32) 0xCFFFF000, FALSE, FALSE));
+}
+
+void PageFrame::init() {
+    uint32 endPage = 0x1000000;
+
+    length = endPage / PAGE_SIZE;
+    frames = (uint32 *) Memory::kmalloc(indexFromBit(length));
+
+    memset((uint8 *) frames, 0, indexFromBit(length));
 }
 
 void Paging::switchDirectory(PageDirectory *newDir) {
@@ -94,15 +99,6 @@ void Paging::fault(Registers r) {
 uint32 *PageFrame::frames = NULL;
 uint32 PageFrame::length = 0;
 
-void PageFrame::init() {
-    uint32 endPage = PAGE_SIZE;
-
-    length = endPage / PAGE_SIZE;
-    frames = (uint32 *) Memory::kmalloc(indexFromBit(length));
-
-    memset((uint8 *) frames, 0, indexFromBit(length));
-}
-
 void PageFrame::set(unsigned int addr) {
     uint32 frame = addr / PAGE_SIZE;
     uint32 idx = indexFromBit(frame);
@@ -139,6 +135,7 @@ int32 PageFrame::first() {
             }
         }
     }
+
     return -1;
 }
 
