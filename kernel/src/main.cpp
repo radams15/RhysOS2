@@ -32,10 +32,10 @@ extern "C" int kmain(){
     uint32 a = Memory::kmalloc(8);
     TTY::printk("A: %x\n", a);
 
-    Paging::init();
+    /*Paging::init();
 
     uint32 b = Memory::kmalloc(8);
-    TTY::printk("B: %x\n", b);
+    TTY::printk("B: %x\n", b);*/
 
     for(;;){
 

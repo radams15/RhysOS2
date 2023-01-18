@@ -7,8 +7,6 @@ from glob import glob
 from sys import platform
 
 from multiprocessing.pool import ThreadPool as Pool
-from multiprocessing import Process
-
 
 class Colour:
     HEADER = '\033[95m'
@@ -20,6 +18,8 @@ class Colour:
     ENDC = '\033[0m'
     BOLD = '\033[1m'
     UNDERLINE = '\033[4m'
+
+DEBUG = False # Start with GDB
 
 KERN_DIRS = ["build/kernel"+x.replace("kernel/src", "") for x in glob("kernel/src/**", recursive=True) if isdir(x)]
 
@@ -34,16 +34,18 @@ BUILD_DIRS = [
 root = getcwd()
 
 if platform == "darwin":
-    CC = f"i686-elf-gcc"
-    CXX = f"i686-elf-g++"
-    AS = f"i686-elf-as"
+    CC = f"i386-elf-gcc"
+    CXX = f"i386-elf-g++"
+    AS = f"i386-elf-as"
+    LD = f"i386-elf-ld"
     GRUB = "grub-mkrescue"
     GRUBISO = "grub-file"
-    OBJCOPY = 'i686-elf-objcopy'
+    OBJCOPY = 'i386-elf-objcopy'
 else:
     CC = f"ccache {root}/cross/{platform}/bin/i686-elf-gcc"
     CXX = f"ccache {root}/cross/{platform}/bin/i686-elf-g++"
     AS = f"{root}/cross/{platform}/bin/i686-elf-as"
+    LD = f"{root}/cross/{platform}/bin/i686-elf-ld"
     GRUB = "grub2-mkrescue"
     GRUBISO = "grub2-file"
     OBJCOPY = f"{root}/cross/{platform}/bin/i686-elf-objcopy"
@@ -76,22 +78,17 @@ def make_dirs():
     for d in filter(lambda x: not exists(x), BUILD_DIRS):
         mkdir(d)
 
-def comp_fonts():
-    font = 'res/fonts/zap-vga09.psf'
-    out = 'build/font.o'
+def comp_bootloader():
+    run_cleanly(f"nasm bootloader/boot.nasm {'-g' if DEBUG else ''} -I bootloader -o build/boot.bin")
 
-    run_cleanly(f"{OBJCOPY} -O elf32-i386 -B i386 -I binary {font} {out}")
-
-    return [out]
+    return 'build/boot.bin'
 
 def comp_kernel():
     obj_files = []
-
-    #system(f"nasm -f elf32 kernel/src/boot/boot.nasm -o build/kernel/boot/boot.o")
-    #obj_files.append("build/kernel/boot/boot.o")
     
     asm_files = [f for f in glob("kernel/src/**/*.S", recursive=True) if f != "kernel/src/boot/boot.nasm"]
-    
+    nasm_files = list(glob("kernel/src/**/*.nasm", recursive=True))
+
     c_files = glob("kernel/src/**/*.c", recursive=True)
     cpp_files = glob("kernel/src/**/*.cpp", recursive=True)
 
@@ -101,7 +98,7 @@ def comp_kernel():
         obj_file = (splitext(nasm_file)[0]+".o").replace("kernel/src", "build/kernel")
         obj_files.append(obj_file)
 
-        command = f"nasm -f elf32 -o {obj_file} {nasm_file} "
+        command = f"nasm -f elf32 {'-g' if DEBUG else ''} -o {obj_file} {nasm_file} "
 
         run_cleanly(command, tabs=1)
 
@@ -109,7 +106,7 @@ def comp_kernel():
         obj_file = (splitext(c_file)[0]+".o").replace("kernel/src", "build/kernel")
         obj_files.append(obj_file)
 
-        command = f"{CC} -std={STD} -ffreestanding -Wall -Wextra -c {c_file} -o {obj_file} -I kernel/include/"
+        command = f"{CC} -std={STD} -ffreestanding -Wall -Wextra -c {c_file} {'-g' if DEBUG else ''} -o {obj_file} -I kernel/include/"
 
         run_cleanly(command, tabs=1)
 
@@ -117,7 +114,7 @@ def comp_kernel():
         obj_file = (splitext(cpp_file)[0]+".o").replace("kernel/src", "build/kernel")
         obj_files.append(obj_file)
 
-        command = f"{CXX} -ffreestanding -Wall -Wextra  -c {cpp_file} -o {obj_file} -I kernel/include/ -fno-exceptions -fno-rtti"
+        command = f"{CXX} -ffreestanding -Wall -Wextra  -c {cpp_file} -o {obj_file} {'-g' if DEBUG else ''} -I kernel/include/ -fno-exceptions -fno-rtti"
 
         run_cleanly(command, tabs=1)
 
@@ -125,7 +122,7 @@ def comp_kernel():
 
     print("\n*** Kernel Compile - NASM ***")
 
-    pool.map(compile_nasm_file, glob("kernel/src/**/*.nasm", recursive=True))
+    pool.map(compile_nasm_file, nasm_files)
 
     print("\n*** Kernel Compile - C ***")
 
@@ -142,7 +139,7 @@ def comp_kernel():
 
 def link_kernel(object_files):
     print("*** Link Kernel ***")
-    command = f"{CXX} -T linker.ld  -ffreestanding -O0 -nostdlib -o {BIN_FILE} -lgcc "
+    command = f"{LD} -T linker.ld -o {BIN_FILE} --oformat binary "
     
     for o in object_files:
         command += o + " "
@@ -150,36 +147,38 @@ def link_kernel(object_files):
     run_cleanly(command, tabs=1)
     print("\n")
 
-def make_iso():
-    print("*** Make ISO ***")
-    rmtree("build/iso/boot/grub")
-    copytree(f"grub/", "build/iso/boot/grub", False, None)
-    
-    run_cleanly(f"{GRUB} -o {ISO_FILE} build/iso", tabs=1)
+    return BIN_FILE
+
+def make_iso(*elems):
+    print("*** Make IMG ***")
+
+    data = b''
+
+    for elem in elems:
+        with open(elem, 'rb') as f:
+            data += f.read()
+
+    with open('build/os.img', 'wb') as f:
+        f.write(data)
+
     print("\n")
 
 
 def run_qemu():
     print("*** Run QEMU ***")
-    run_cleanly(f"qemu-system-x86_64 -cdrom {ISO_FILE} -m {MEMORY} -serial file:{KERNEL_LOGFILE}", tabs=1) # -drive format=raw,file=filesystem.cpio -serial file:{KERNEL_LOGFILE}
-    print("\n")
-
-
-def check_iso():
-    print("*** Check Multiboot ***")
-    run_cleanly(f"{GRUBISO} --is-x86-multiboot {BIN_FILE}", tabs=1)
+    run_cleanly(f"qemu-system-i386 -fda build/os.img -m {MEMORY} {'-s -S' if DEBUG else ''} -serial file:{KERNEL_LOGFILE}", tabs=1) # -drive format=raw,file=filesystem.cpio -serial file:{KERNEL_LOGFILE}
     print("\n")
 
 
 if __name__ == "__main__":
     clean()
     make_dirs()
+
+    bootloader = comp_bootloader()
     
     objs = comp_kernel()
-    #objs += comp_fonts()
-    link_kernel(objs)
+    kernel = link_kernel(objs)
 
-    make_iso()
-    check_iso()
+    make_iso(bootloader, kernel)
 
     run_qemu()
