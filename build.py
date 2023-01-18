@@ -20,6 +20,10 @@ class Colour:
     UNDERLINE = '\033[4m'
 
 DEBUG = False # Start with GDB
+DEFS = {
+    #'VIDEO': 1
+    'FLOPPY': 1
+}
 
 KERN_DIRS = ["build/kernel"+x.replace("kernel/src", "") for x in glob("kernel/src/**", recursive=True) if isdir(x)]
 
@@ -32,6 +36,7 @@ BUILD_DIRS = [
 ] + KERN_DIRS
 
 root = getcwd()
+def_str = ' '.join(f'-D{k}={v}' for k, v in DEFS.items())
 
 if platform == "darwin":
     CC = f"i386-elf-gcc"
@@ -79,7 +84,7 @@ def make_dirs():
         mkdir(d)
 
 def comp_bootloader():
-    run_cleanly(f"nasm bootloader/boot.nasm {'-g' if DEBUG else ''} -I bootloader -o build/boot.bin")
+    run_cleanly(f"nasm bootloader/boot.nasm {def_str} {'-g' if DEBUG else ''} -I bootloader -o build/boot.bin")
 
     return 'build/boot.bin'
 
@@ -98,7 +103,7 @@ def comp_kernel():
         obj_file = (splitext(nasm_file)[0]+".o").replace("kernel/src", "build/kernel")
         obj_files.append(obj_file)
 
-        command = f"nasm -f elf32 {'-g' if DEBUG else ''} -o {obj_file} {nasm_file} "
+        command = f"nasm -f elf32 {'-g' if DEBUG else ''} {def_str} -o {obj_file} {nasm_file} "
 
         run_cleanly(command, tabs=1)
 
@@ -106,7 +111,7 @@ def comp_kernel():
         obj_file = (splitext(c_file)[0]+".o").replace("kernel/src", "build/kernel")
         obj_files.append(obj_file)
 
-        command = f"{CC} -std={STD} -ffreestanding -Wall -Wextra -c {c_file} {'-g' if DEBUG else ''} -o {obj_file} -I kernel/include/"
+        command = f"{CC} -std={STD} -ffreestanding -Wall -Wextra -c {c_file} {def_str} {'-g' if DEBUG else ''} -o {obj_file} -I kernel/include/"
 
         run_cleanly(command, tabs=1)
 
@@ -114,7 +119,7 @@ def comp_kernel():
         obj_file = (splitext(cpp_file)[0]+".o").replace("kernel/src", "build/kernel")
         obj_files.append(obj_file)
 
-        command = f"{CXX} -ffreestanding -Wall -Wextra  -c {cpp_file} -o {obj_file} {'-g' if DEBUG else ''} -I kernel/include/ -fno-exceptions -fno-rtti"
+        command = f"{CXX} -ffreestanding -Wall -Wextra {def_str} -c {cpp_file} -o {obj_file} {'-g' if DEBUG else ''} -I kernel/include/ -fno-exceptions -fno-rtti"
 
         run_cleanly(command, tabs=1)
 
@@ -166,7 +171,7 @@ def make_iso(*elems):
 
 def run_qemu():
     print("*** Run QEMU ***")
-    run_cleanly(f"qemu-system-i386 -fda build/os.img -m {MEMORY} {'-s -S' if DEBUG else ''} -serial file:{KERNEL_LOGFILE}", tabs=1) # -drive format=raw,file=filesystem.cpio -serial file:{KERNEL_LOGFILE}
+    run_cleanly(f"qemu-system-i386 -drive format=raw,file=build/os.img -m {MEMORY} {'-s -S' if DEBUG else ''} -serial file:{KERNEL_LOGFILE}", tabs=1) # -drive format=raw,file=filesystem.cpio -serial file:{KERNEL_LOGFILE}
     print("\n")
 
 

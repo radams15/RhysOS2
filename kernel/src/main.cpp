@@ -5,12 +5,23 @@
 #include "Panic.h"
 #include "Memory/Paging.h"
 #include "libc/List.h"
+#include "IO/Graphics.h"
+
+#ifdef VIDEO
+#define OUT Graphics::panic
+#else
+#define OUT TTY::printk
+#endif
 
 bool init(){
     GDT::init();
     IDT::init();
 
+#ifdef VIDEO
+    Graphics::init();
+#else
     TTY::init(VGA_COLOUR_BLACK, VGA_COLOUR_WHITE);
+#endif
 
     IDT::enable();
 
@@ -23,14 +34,11 @@ extern "C" int kmain(){
     int fail = init();
 
     if(fail){
-        TTY::printk("Boot failed!\n");
+        OUT("Boot failed!\n");
         halt();
     }
 
-    TTY::printk("Boot Complete!\n");
-
-    uint32 a = Memory::kmalloc(8);
-    TTY::printk("A: %x\n", a);
+    OUT("Boot Complete!\n");
 
     /*Paging::init();
 

@@ -21,7 +21,7 @@ driveNum:          db    0
 reserved:          db    0
 signature:         db    0x29
 volumeID:          dd    0x2d7e5a1a
-volumeLabel:       db    "NO NAME    "
+volumeLabel:       db    "RhysOS    "
 fileSysType:       db    "FAT12   "
 
 boot:
@@ -35,15 +35,17 @@ boot:
 
     call load_kernel
 
-    ;call set_video_mode
+%ifdef VIDEO
+    call set_video_mode
+%endif
     call set_protected_mode
 
     jmp $
 
 %include "bprint.nasm"
-%include "bprint_p.nasm"
 %include "video_mode.nasm"
 %include "disk/floppy.nasm"
+%include "disk/hdd.nasm"
 %include "gdt.nasm"
 %include "protected_mode.nasm"
 
@@ -54,7 +56,11 @@ load_kernel:
     mov dh, 40
 
     mov dl, [BOOT_DRIVE]
+%ifdef FLOPPY
     call floppy_load
+%else
+    call hdd_load
+%endif
     ret
 
 [bits 32]
