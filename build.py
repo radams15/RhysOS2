@@ -25,6 +25,8 @@ DEFS = {
     'FLOPPY': 1
 }
 
+BOOT_DEVICE = 'hda'
+
 KERN_DIRS = ["build/kernel"+x.replace("kernel/src", "") for x in glob("kernel/src/**", recursive=True) if isdir(x)]
 
 BUILD_DIRS = [
@@ -171,7 +173,7 @@ def make_iso(*elems):
 
 def run_qemu():
     print("*** Run QEMU ***")
-    run_cleanly(f"qemu-system-i386 -drive format=raw,file=build/os.img -m {MEMORY} {'-s -S' if DEBUG else ''} -serial file:{KERNEL_LOGFILE}", tabs=1) # -drive format=raw,file=filesystem.cpio -serial file:{KERNEL_LOGFILE}
+    run_cleanly(f"qemu-system-i386 -{BOOT_DEVICE} build/os.img -m {MEMORY} {'-s -S' if DEBUG else ''} -serial file:{KERNEL_LOGFILE}", tabs=1) # -drive format=raw,file=filesystem.cpio -serial file:{KERNEL_LOGFILE}
     print("\n")
 
 

@@ -1,4 +1,4 @@
-https://github.com/AA-Hamza/floppy-os/blob/main/boot/disk/disk_load.asm
+; https://github.com/AA-Hamza/floppy-os/blob/main/boot/disk/disk_load.asm
 
 hdd_load:
     push dx
@@ -15,7 +15,6 @@ hdd_load:
     jc hdd_error
 
     pop dx
-    ret
 
 
 HDD_ERROR_MSG:
