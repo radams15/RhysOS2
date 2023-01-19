@@ -6,6 +6,8 @@
 #include "Memory/Paging.h"
 #include "libc/List.h"
 #include "IO/Graphics.h"
+#include "IO/Keyboard.h"
+#include "IO/Keymap.h"
 
 #ifdef VIDEO
 #define OUT Graphics::panic
@@ -23,11 +25,18 @@ bool init(){
     TTY::init(VGA_COLOUR_BLACK, VGA_COLOUR_WHITE);
 #endif
 
+    Keyboard::init();
+
     IDT::enable();
 
     Clock::init();
 
     return FALSE;
+}
+
+
+void key_pressed(uint32 code){
+    TTY::putc(keymap[code]);
 }
 
 extern "C" int kmain(){
@@ -37,6 +46,8 @@ extern "C" int kmain(){
         OUT("Boot failed!\n");
         halt();
     }
+
+    Keyboard::register_handler(key_pressed);
 
     OUT("Boot Complete!\n");
 
