@@ -42,9 +42,9 @@ open FH, '>', $OUT_FILE;
 
 print FH "#ifndef RHYSOS_KEYMAP_H\n#define RHYSOS_KEYMAP_H\n\n#include \"Types.h\"\n\nint32 keymap[] = {";
 for my $i (0..$largest_code) {
-    my $char = (exists $keymap{$i})? $keymap{$i} : ' ';
+    my $char = (exists $keymap{$i})? "'$keymap{$i}'" : 'NULL';
 
-    print FH "\t'$char',\n";
+    print FH "\t$char,\n";
 }
 print FH "\tNULL\n};\n\n#endif\n";
 

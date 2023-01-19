@@ -171,11 +171,13 @@ void TTY::print_args(const char *text, va_list args) {
 }
 
 void TTY::putCursor(uint16 x, uint16 y) {
-    col=y;
-    row=x;
+    col=x;
+    row=y;
 
-    uint16 loc = getBufIndex(x, y);
+    putCursor(getBufIndex(x, y));
+}
 
+void TTY::putCursor(uint16 loc) {
     Ports::outb(0x3D4, 14);
     Ports::outb(0x3D5, loc >> 8);
     Ports::outb(0x3D4, 15);
@@ -192,4 +194,8 @@ void TTY::scroll() {
     }
 
     row--;
+}
+
+uint16 TTY::currentIndex() {
+    return getBufIndex(col, row);
 }

@@ -3,11 +3,8 @@
 #include "Interrupts/IDT.h"
 #include "Interrupts/Clock.h"
 #include "Panic.h"
-#include "Memory/Paging.h"
-#include "libc/List.h"
-#include "IO/Graphics.h"
 #include "IO/Keyboard.h"
-#include "IO/Keymap.h"
+#include "TextEdit.h"
 
 #ifdef VIDEO
 #define OUT Graphics::panic
@@ -34,11 +31,6 @@ bool init(){
     return FALSE;
 }
 
-
-void key_pressed(uint32 code){
-    TTY::putc(keymap[code]);
-}
-
 extern "C" int kmain(){
     int fail = init();
 
@@ -47,9 +39,9 @@ extern "C" int kmain(){
         halt();
     }
 
-    Keyboard::register_handler(key_pressed);
-
     OUT("Boot Complete!\n");
+
+    TextEdit::run();
 
     /*Paging::init();
 

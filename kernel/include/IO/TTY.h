@@ -20,14 +20,14 @@ private:
 
     static uint16 getBufIndex(uint8 x, uint8 y);
 
-    static void setChar(uint16 x, uint16 y, uint8 c);
-    static void setChar(uint16 pos, uint8 c);
-
     static void print_args(const char* text, va_list args);
 
 public:
     static void init(vga_color fg, vga_color bg);
     static void setColour(vga_color fg, vga_color bg);
+
+    static void setChar(uint16 x, uint16 y, uint8 c);
+    static void setChar(uint16 pos, uint8 c);
 
     static void clear();
     static void putc(uint8 c);
@@ -35,7 +35,10 @@ public:
     static void printk(const char* text, ...);
 
     static void putCursor(uint16 x, uint16 y);
+    static void putCursor(uint16 loc);
     static void scroll();
+
+    static uint16 currentIndex();
 };
 
 
