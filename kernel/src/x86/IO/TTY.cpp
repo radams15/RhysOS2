@@ -57,7 +57,7 @@ uint16 TTY::getBufIndex(uint8 x, uint8 y) {
 }
 
 void TTY::putc(uint8 c) {
-    if(col >= VGA_HEIGHT-1){
+    if(row >= VGA_HEIGHT-1){
         scroll();
     }
 
@@ -65,6 +65,10 @@ void TTY::putc(uint8 c) {
         case '\n':
             row++;
             col = 0;
+            break;
+
+        case '\b': // TODO: Backspace broken
+            col--;
             break;
 
         case '\t':
@@ -184,8 +188,8 @@ void TTY::scroll() {
     }
 
     for(uint32 i=((VGA_HEIGHT-1)*VGA_WIDTH); i<(VGA_HEIGHT*VGA_WIDTH) ; i++){
-        buf[i] = ' ';
+        buf[i] = VGA_CHR(' ', colour);
     }
 
-    col--;
+    row--;
 }

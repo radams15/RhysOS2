@@ -33,7 +33,7 @@ my %keymap = (
 	0x1C => '\n',
 	0x0F => '\t',
 	0x0E => '\b',
-	0x39 => ' '
+	0x39 => ' ',
 );
 
 my ($largest_code) = sort {$b <=> $a} keys %keymap;
