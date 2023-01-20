@@ -7,6 +7,7 @@
 #include "Math.h"
 #include "String.h"
 #include "IO/Ports.h"
+#include "Memory/Memory.h"
 
 #define FORMAT_MARK '%'
 
@@ -122,7 +123,7 @@ void TTY::printk(const char *text, ...) {
     va_end(args);
 }
 
-void TTY::print_args(const char *text, va_list args) {
+void TTY::print_args(const char *text, va_list args, bool doFormat) {
     bool skip_next = FALSE;
 
     for (int i=0; text[i] != NULL; i++){
@@ -131,7 +132,7 @@ void TTY::print_args(const char *text, va_list args) {
             continue;
         }
 
-        if(text[i] == FORMAT_MARK){
+        if(text[i] == FORMAT_MARK and doFormat){
             char formatter = text[i+1];
 
             switch(formatter){
@@ -198,4 +199,12 @@ void TTY::scroll() {
 
 uint16 TTY::currentIndex() {
     return getBufIndex(col, row);
+}
+
+uint16 *TTY::getBuf() {
+    return buf;
+}
+
+void TTY::setBuf(unsigned short *newBuf) {
+    memcpy((uint8*) buf, (uint8*) newBuf, VGA_WIDTH*VGA_HEIGHT);
 }
