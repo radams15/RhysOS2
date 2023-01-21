@@ -6,15 +6,14 @@
 #include "IO/Keyboard.h"
 #include "IO/TTY.h"
 #include "IO/Keymap.h"
-#include "Memory/Memory.h"
 
-int8 TextEdit::buf[] = " ";
+int8 TextEdit::buf[] = "abcdef";
 uint8 TextEdit::x = 0, TextEdit::y = 1;
 
 void TextEdit::run() {
     Keyboard::register_handler(key_press);
 
-    //memset_s((int8*) buf, 'f', VGA_WIDTH*VGA_HEIGHT);
+    //memset_s((int8*) buf, ' ', VGA_WIDTH*VGA_HEIGHT);
 
     redraw();
 }
@@ -23,18 +22,22 @@ void TextEdit::key_press(uint32 code) {
     TTY::putCursor(x, y);
 
     char chr;
+
     if(keymap[code] == '\b'){
         buf[TTY::currentIndex()-1] = ' ';
         x--;
     } else if(keymap[code] == '\n'){
         buf[TTY::currentIndex()] = ' ';
-        for(int xv=0 ; xv<VGA_WIDTH-x ; xv++) buf[TTY::currentIndex()+xv] = ' '; // Replace every char in the line with blanks to allow printk to not stop at NULLs.
+        for(int xv=0 ; xv<VGA_WIDTH-x ; xv++){
+            buf[TTY::currentIndex()+xv] = ' '; // Replace every char in the line with blanks to allow printk to not stop at NULLs.
+        }
         y++;
         x=0;
     } else if((chr=keymap[code]) != NULL){
         buf[TTY::currentIndex()] = chr;
         x++;
     }
+
     redraw();
 }
 

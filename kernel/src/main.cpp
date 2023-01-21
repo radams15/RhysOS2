@@ -5,16 +5,14 @@
 #include "Panic.h"
 #include "IO/Keyboard.h"
 #include "TextEdit.h"
+#include "IO/Serial.h"
 
-#ifdef VIDEO
-#define OUT Graphics::panic
-#else
-#define OUT TTY::printk
-#endif
 
 bool init(){
     GDT::init();
     IDT::init();
+
+    //Serial::init();
 
 #ifdef VIDEO
     Graphics::init();
@@ -35,13 +33,14 @@ extern "C" int kmain(){
     int fail = init();
 
     if(fail){
-        OUT("Boot failed!\n");
+        TTY::printk("Boot failed!\n");
         halt();
     }
 
-    OUT("Boot Complete!\n");
+    //Serial::write("Boot completed!\n");
+    TTY::printk("Boot Complete!\n");
 
-    TextEdit::run();
+    //TextEdit::run();
 
     /*Paging::init();
 

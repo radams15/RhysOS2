@@ -68,7 +68,7 @@ void TTY::putc(uint8 c) {
             col = 0;
             break;
 
-        case '\b': // TODO: Backspace broken
+        case '\b':
             col--;
             break;
 
@@ -124,6 +124,7 @@ void TTY::printk(const char *text, ...) {
 }
 
 void TTY::print_args(const char *text, va_list args, bool doFormat) {
+    //putc('^');
     bool skip_next = FALSE;
 
     for (int i=0; text[i] != NULL; i++){
@@ -169,6 +170,8 @@ void TTY::print_args(const char *text, va_list args, bool doFormat) {
             putc(text[i]);
         }
     }
+
+    //putc('$');
 }
 
 void TTY::putCursor(uint16 x, uint16 y) {

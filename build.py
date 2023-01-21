@@ -34,7 +34,6 @@ BUILD_DIRS = [
 
     "build/iso",
     "build/iso/boot",
-    "build/iso/boot/grub"
 ] + KERN_DIRS
 
 root = getcwd()
