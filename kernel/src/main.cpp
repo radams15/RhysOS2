@@ -12,7 +12,7 @@ bool init(){
     GDT::init();
     IDT::init();
 
-    //Serial::init();
+    Serial::init();
 
 #ifdef VIDEO
     Graphics::init();
@@ -37,7 +37,7 @@ extern "C" int kmain(){
         halt();
     }
 
-    //Serial::write("Boot completed!\n");
+    Serial::write("Boot completed!\n");
     TTY::printk("Boot Complete!\n");
 
     //TextEdit::run();

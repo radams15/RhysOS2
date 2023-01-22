@@ -51,6 +51,8 @@ boot:
 
 [bits 16]
 load_kernel:
+    mov ebx, MSG_LOAD
+    call bprint
     mov bx, KERNEL_OFFSET
 
     mov dh, 40
@@ -74,6 +76,7 @@ start_kernel:
 
 BOOT_DRIVE      db 0
 MSG_REAL        db "Entering real mode", 0
+MSG_LOAD        db "Reading kernel", 0
 MSG_PROTECTED   db "Entering protected mode", 0
 MSG_KERNEL      db "Loading kernel", 0
 

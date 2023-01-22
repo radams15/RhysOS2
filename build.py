@@ -19,21 +19,18 @@ class Colour:
     BOLD = '\033[1m'
     UNDERLINE = '\033[4m'
 
-DEBUG = False # Start with GDB
+DEBUG = True # Start with GDB
 DEFS = {
     #'VIDEO': 1
     'FLOPPY': 1
 }
 
-BOOT_DEVICE = 'hda'
+BOOT_DEVICE = 'fda'
 
 KERN_DIRS = ["build/kernel"+x.replace("kernel/src", "") for x in glob("kernel/src/**", recursive=True) if isdir(x)]
 
 BUILD_DIRS = [
-    "build",
-
-    "build/iso",
-    "build/iso/boot",
+    "build"
 ] + KERN_DIRS
 
 root = getcwd()
@@ -58,8 +55,9 @@ else:
 
 STD = "gnu99"
 
-BIN_FILE = f"{root}/build/iso/boot/RhysOS.bin"
-ISO_FILE = f"{root}/build/RhysOS.iso"
+BOOTLOADER_BIN_FILE = f"{root}/build/bootloader.bin"
+KERNEL_BIN_FILE = f"{root}/build/kernel.bin"
+IMG_FILE = f"{root}/build/RhysOS.img"
 
 KERNEL_LOGFILE = f"{root}/kernel_log.txt"
 MEMORY = 128
@@ -85,9 +83,9 @@ def make_dirs():
         mkdir(d)
 
 def comp_bootloader():
-    run_cleanly(f"nasm bootloader/boot.nasm {def_str} {'-g' if DEBUG else ''} -I bootloader -o build/boot.bin")
+    run_cleanly(f"nasm bootloader/boot.nasm {def_str} {'-g' if DEBUG else ''} -I bootloader -o {BOOTLOADER_BIN_FILE}")
 
-    return 'build/boot.bin'
+    return BOOTLOADER_BIN_FILE
 
 def comp_kernel():
     obj_files = []
@@ -145,7 +143,7 @@ def comp_kernel():
 
 def link_kernel(object_files):
     print("*** Link Kernel ***")
-    command = f"{LD} -T linker.ld -o {BIN_FILE} --oformat binary "
+    command = f"{LD} -T linker.ld -o {KERNEL_BIN_FILE} --oformat binary "
     
     for o in object_files:
         command += o + " "
@@ -153,7 +151,7 @@ def link_kernel(object_files):
     run_cleanly(command, tabs=1)
     print("\n")
 
-    return BIN_FILE
+    return KERNEL_BIN_FILE
 
 def make_iso(*elems):
     print("*** Make IMG ***")
@@ -164,7 +162,7 @@ def make_iso(*elems):
         with open(elem, 'rb') as f:
             data += f.read()
 
-    with open('build/os.img', 'wb') as f:
+    with open(IMG_FILE, 'wb') as f:
         f.write(data)
 
     print("\n")
@@ -172,7 +170,7 @@ def make_iso(*elems):
 
 def run_qemu():
     print("*** Run QEMU ***")
-    run_cleanly(f"qemu-system-i386 -{BOOT_DEVICE} build/os.img -m {MEMORY} {'-s -S' if DEBUG else ''} -serial file:{KERNEL_LOGFILE}", tabs=1) # -drive format=raw,file=filesystem.cpio -serial file:{KERNEL_LOGFILE}
+    run_cleanly(f"qemu-system-i386 -boot a -{BOOT_DEVICE} {IMG_FILE} -m {MEMORY} {'-s -S' if DEBUG else ''} -serial file:{KERNEL_LOGFILE}", tabs=1)
     print("\n")
 
 
@@ -184,6 +182,8 @@ if __name__ == "__main__":
     
     objs = comp_kernel()
     kernel = link_kernel(objs)
+
+    print(bootloader, kernel)
 
     make_iso(bootloader, kernel)
 
