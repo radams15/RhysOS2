@@ -14,11 +14,7 @@ bool init(){
 
     Serial::init();
 
-#ifdef VIDEO
-    Graphics::init();
-#else
     TTY::init(VGA_COLOUR_BLACK, VGA_COLOUR_WHITE);
-#endif
 
     Keyboard::init();
 
@@ -46,10 +42,6 @@ extern "C" int kmain(){
 
     uint32 b = Memory::kmalloc(8);
     TTY::printk("B: %x\n", b);*/
-
-    for(;;){
-
-    }
 
     return 0;
 }

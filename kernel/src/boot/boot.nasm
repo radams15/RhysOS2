@@ -5,7 +5,6 @@ _start:
 	call kmain
 	jmp $
 
-extern halt
-
+global halt
 halt:
 	jmp halt;

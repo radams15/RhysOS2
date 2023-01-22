@@ -19,7 +19,7 @@ class Colour:
     BOLD = '\033[1m'
     UNDERLINE = '\033[4m'
 
-DEBUG = True # Start with GDB
+DEBUG = False # Start with GDB
 DEFS = {
     #'VIDEO': 1
     'FLOPPY': 1
@@ -45,13 +45,13 @@ if platform == "darwin":
     GRUBISO = "grub-file"
     OBJCOPY = 'i386-elf-objcopy'
 else:
-    CC = f"ccache {root}/cross/{platform}/bin/i686-elf-gcc"
-    CXX = f"ccache {root}/cross/{platform}/bin/i686-elf-g++"
-    AS = f"{root}/cross/{platform}/bin/i686-elf-as"
-    LD = f"{root}/cross/{platform}/bin/i686-elf-ld"
+    CC = f"ccache /home/rhys/scripts/i386-gnu-gcc/bin/i386-elf-gcc"
+    CXX = f"ccache /home/rhys/scripts/i386-gnu-gcc/bin/i386-elf-g++"
+    AS = f"/home/rhys/scripts/i386-gnu-gcc/bin/i386-elf-as"
+    LD = f"/home/rhys/scripts/i386-gnu-gcc/bin/i386-elf-ld"
     GRUB = "grub2-mkrescue"
     GRUBISO = "grub2-file"
-    OBJCOPY = f"{root}/cross/{platform}/bin/i686-elf-objcopy"
+    OBJCOPY = f"/home/rhys/scripts/i386-gnu-gcc/bin/i386-elf-objcopy"
 
 STD = "gnu99"
 
@@ -143,7 +143,7 @@ def comp_kernel():
 
 def link_kernel(object_files):
     print("*** Link Kernel ***")
-    command = f"{LD} -T linker.ld -o {KERNEL_BIN_FILE} --oformat binary "
+    command = f"{CC} -T linker.ld -o {KERNEL_BIN_FILE} -ffreestanding -O0 -nostdlib "
     
     for o in object_files:
         command += o + " "
@@ -170,7 +170,7 @@ def make_iso(*elems):
 
 def run_qemu():
     print("*** Run QEMU ***")
-    run_cleanly(f"qemu-system-i386 -boot a -{BOOT_DEVICE} {IMG_FILE} -m {MEMORY} {'-s -S' if DEBUG else ''} -serial file:{KERNEL_LOGFILE}", tabs=1)
+    run_cleanly(f"qemu-system-i386 -boot a -{BOOT_DEVICE} {IMG_FILE} -d int,cpu_reset -m {MEMORY} {'-s -S' if DEBUG else ''} -serial file:{KERNEL_LOGFILE}", tabs=1)
     print("\n")
 
 
@@ -181,6 +181,9 @@ if __name__ == "__main__":
     bootloader = comp_bootloader()
     
     objs = comp_kernel()
+
+    objs = [x for x in objs if 'TextEdit' not in x]
+
     kernel = link_kernel(objs)
 
     print(bootloader, kernel)
