@@ -11,6 +11,13 @@ void Ports::outb(uint16 port, uint8 value) {
     //port_outb(port, value);
 }
 
+void Ports::outl(uint16 port, uint32 val){
+    asm volatile(
+            "outl %%eax,%%dx" : : "a"(val), "d"(port)
+            );
+}
+
+
 uint8 Ports::inb(uint16 port) {
     uint8 out;
 

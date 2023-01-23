@@ -29,7 +29,7 @@ else:
 	print("Src Path Exists!")
 
 
-source = path.join(SRC, *dirs, f"{file_name}.c")
+source = path.join(SRC, *dirs, f"{file_name}.cpp")
 header = path.join(INC, *dirs, f"{file_name}.h")
 
 if not path.exists(source) and not path.exists(header):
