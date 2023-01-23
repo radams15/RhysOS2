@@ -182,8 +182,6 @@ if __name__ == "__main__":
     
     objs = comp_kernel()
 
-    objs = [x for x in objs if 'TextEdit' not in x]
-
     kernel = link_kernel(objs)
 
     print(bootloader, kernel)

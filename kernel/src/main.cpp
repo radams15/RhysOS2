@@ -36,7 +36,7 @@ extern "C" int kmain(){
     Serial::write("Boot completed!\n");
     TTY::printk("Boot Complete!\n");
 
-    //TextEdit::run();
+    TextEdit::run();
 
     /*Paging::init();
 

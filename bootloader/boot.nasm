@@ -51,8 +51,6 @@ boot:
 
 [bits 16]
 load_kernel:
-    mov ebx, MSG_LOAD
-    call bprint
     mov bx, KERNEL_OFFSET
 
     mov dh, 40
