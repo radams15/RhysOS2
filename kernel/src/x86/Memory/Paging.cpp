@@ -22,7 +22,7 @@ void Paging::init() {
     memset((uint8 *) kernelDirectory, 0, sizeof(PageDirectory));
     currentDirectory = kernelDirectory;
 
-    for(int i=Heap::KHEAP_START ; i<Heap::KHEAP_START+Heap::KHEAP_INITIAL_SIZE ; i+=PAGE_SIZE){
+    for(uint32 i=Heap::KHEAP_START ; i<Heap::KHEAP_START+Heap::KHEAP_INITIAL_SIZE ; i+=PAGE_SIZE){
         getPage(i, TRUE, kernelDirectory);
     }
 

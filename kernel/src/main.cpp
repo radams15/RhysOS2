@@ -6,6 +6,8 @@
 #include "IO/Keyboard.h"
 #include "TextEdit.h"
 #include "IO/Serial.h"
+#include "Memory/Paging.h"
+#include "Memory/malloc.h"
 
 
 bool init(){
@@ -35,11 +37,6 @@ extern "C" int kmain(){
 
     Serial::write("Boot completed!\n");
     TTY::printk("Boot Complete!\n");
-
-    /*Paging::init();
-
-    uint32 b = Memory::kmalloc(8);
-    TTY::printk("B: %x\n", b);*/
 
     return 0;
 }

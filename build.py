@@ -36,6 +36,8 @@ BUILD_DIRS = [
 root = getcwd()
 def_str = ' '.join(f'-D{k}={v}' for k, v in DEFS.items())
 
+CFLAGS = '-ffreestanding -Wall' # -Wextra
+
 if platform == "darwin":
     CC = f"i386-elf-gcc"
     CXX = f"i386-elf-g++"
@@ -110,7 +112,7 @@ def comp_kernel():
         obj_file = (splitext(c_file)[0]+".o").replace("kernel/src", "build/kernel")
         obj_files.append(obj_file)
 
-        command = f"{CC} -std={STD} -ffreestanding -Wall -Wextra -c {c_file} {def_str} {'-g' if DEBUG else ''} -o {obj_file} -I kernel/include/"
+        command = f"{CC} -std={STD} {CFLAGS} -c {c_file} {def_str} {'-g' if DEBUG else ''} -o {obj_file} -I kernel/include/"
 
         run_cleanly(command, tabs=1)
 
@@ -118,7 +120,7 @@ def comp_kernel():
         obj_file = (splitext(cpp_file)[0]+".o").replace("kernel/src", "build/kernel")
         obj_files.append(obj_file)
 
-        command = f"{CXX} -ffreestanding -Wall -Wextra {def_str} -c {cpp_file} -o {obj_file} {'-g' if DEBUG else ''} -I kernel/include/ -fno-exceptions -fno-rtti"
+        command = f"{CXX} {CFLAGS} {def_str} -c {cpp_file} -o {obj_file} {'-g' if DEBUG else ''} -I kernel/include/ -fno-exceptions -fno-rtti"
 
         run_cleanly(command, tabs=1)
 

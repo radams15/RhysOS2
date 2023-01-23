@@ -17,7 +17,7 @@ Heap::Heap(uint32 start, uint32 end, uint32 max, uint8 supervisor, uint8 readOnl
 
     start += sizeof(void*)*HEAP_INDEX_SIZE;
 
-    if(start & 0xFFFFF000 == 0){
+    if((start & 0xFFFFF000) == 0){
         start &= 0xFFFFF000; // Page alignment
         start += PAGE_SIZE;
     }
@@ -229,7 +229,7 @@ int32 Heap::smallestHole(uint32 size, uint8 align) {
             uint32 loc = (uint32) head;
             int32 offset = 0;
 
-            if ((loc+sizeof(HeapHeader)) & 0xFFFFF000 != 0) {
+            if (((loc+sizeof(HeapHeader)) & 0xFFFFF000) != 0) {
                 offset = PAGE_SIZE /* page size */  - (loc + sizeof(HeapHeader)) % PAGE_SIZE;
             }
 
@@ -253,7 +253,7 @@ int32 Heap::smallestHole(uint32 size, uint8 align) {
 }
 
 void Heap::expand(uint32 newSize) {
-    if(newSize&0xFFFFF000 != 0){
+    if((newSize&0xFFFFF000) != 0){
         newSize &= 0xFFFFF000;
         newSize += PAGE_SIZE;
     }
@@ -272,7 +272,7 @@ void Heap::expand(uint32 newSize) {
 }
 
 uint32 Heap::contract(uint32 newSize) {
-    if(newSize&PAGE_SIZE != 0){
+    if((newSize&PAGE_SIZE) != 0){
         newSize &= PAGE_SIZE;
         newSize += PAGE_SIZE;
     }

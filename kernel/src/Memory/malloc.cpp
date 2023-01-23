@@ -23,7 +23,7 @@ uint32 Memory::kmalloc(uint32 size, bool align, uint32* physical) {
         void* addr = Heap::getKheap()->alloc(size, align);
         if(physical != 0){
             Page* page = Paging::getPage((uint32) addr, FALSE, Paging::getKernelDirectory());
-            *physical = page->frame*PAGE_SIZE + (uint32)addr&0xFFF;
+            *physical = page->frame*PAGE_SIZE + ((uint32)addr&0xFFF);
         }
 
         return (uint32) addr;
