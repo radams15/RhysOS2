@@ -36,8 +36,6 @@ extern "C" int kmain(){
     Serial::write("Boot completed!\n");
     TTY::printk("Boot Complete!\n");
 
-    TextEdit::run();
-
     /*Paging::init();
 
     uint32 b = Memory::kmalloc(8);

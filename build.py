@@ -143,7 +143,7 @@ def comp_kernel():
 
 def link_kernel(object_files):
     print("*** Link Kernel ***")
-    command = f"{CC} -T linker.ld -o {KERNEL_BIN_FILE} -ffreestanding -O0 -nostdlib "
+    command = f"{LD} -T linker.ld -o {KERNEL_BIN_FILE} -O0 -nostdlib --oformat binary "
     
     for o in object_files:
         command += o + " "
@@ -170,7 +170,7 @@ def make_iso(*elems):
 
 def run_qemu():
     print("*** Run QEMU ***")
-    run_cleanly(f"qemu-system-i386 -boot a -{BOOT_DEVICE} {IMG_FILE} -d int,cpu_reset -m {MEMORY} {'-s -S' if DEBUG else ''} -serial file:{KERNEL_LOGFILE}", tabs=1)
+    run_cleanly(f"qemu-system-i386 -boot a -{BOOT_DEVICE} {IMG_FILE} {'-d int,cpu_reset' if DEBUG else ''} -m {MEMORY} {'-s -S' if DEBUG else ''} -serial file:{KERNEL_LOGFILE}", tabs=1)
     print("\n")
 
 
