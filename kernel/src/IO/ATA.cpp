@@ -137,9 +137,12 @@ void ATA::readSect(unsigned int lba, uint8 *buffer) {
     waitBusy();
     waitDrq();
 
-    for(int i=0 ; i<256 ; i+=2) {
-        uint8 a = Ports::inw(ATA_PRIMARY_IO + ATA_REG_DATA);
-        uint8 b = Ports::inw(ATA_PRIMARY_IO + ATA_REG_DATA);
+    for(int i=0 ; i<20 ; i+=2) { // 256
+        uint16 data = Ports::inw(ATA_PRIMARY_IO + ATA_REG_DATA);
+
+        uint8 a, b;
+        a = (uint8) data;
+        b = (uint8) (data >> 8);
 
         buffer[i] = a;
         buffer[i+1] = b;

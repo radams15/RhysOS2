@@ -170,7 +170,7 @@ def make_iso(*elems):
 
 def run_qemu():
     print("*** Run QEMU ***")
-    run_cleanly(f"qemu-system-i386 -boot a -fda {IMG_FILE} -hda disk.img  {'-d int,cpu_reset' if DEBUG else ''} -m {MEMORY} {'-s -S' if DEBUG else ''} -serial file:{KERNEL_LOGFILE}", tabs=1)
+    run_cleanly(f"qemu-system-i386 -boot a -fda {IMG_FILE} -hda disk.tar  {'-d int,cpu_reset' if DEBUG else ''} -m {MEMORY} {'-s -S' if DEBUG else ''} -serial file:{KERNEL_LOGFILE}", tabs=1)
     print("\n")
 
 

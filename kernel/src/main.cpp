@@ -33,7 +33,6 @@ bool init(){
 extern "C" int kmain(){
     int fail = init();
 
-
     if(fail){
         TTY::printk("Boot failed!\n");
         halt();
@@ -43,9 +42,9 @@ extern "C" int kmain(){
     TTY::printk("Boot Complete!\n");
 
     uint8 buf[256];
-    ATA::readSect(1, buf);
-    for(uint16 i=0 ; i<sizeof(buf) ; i++){
-        TTY::printk("%d=%c\n", i, buf[i]);
+    ATA::readSect(0, buf);
+    for(uint16 i=0 ; i<16 ; i++){
+        TTY::printk("%x\n", buf[i]);
     }
 
 
