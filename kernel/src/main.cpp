@@ -42,10 +42,10 @@ extern "C" int kmain(){
     Serial::write("Boot completed!\n");
     TTY::printk("Boot Complete!\n");
 
-    uint32 buf[ATA::ATA_CHUNK*2];
-    ATA::readSects(0, 2, buf);
+    uint8 buf[256];
+    ATA::readSect(1, buf);
     for(uint16 i=0 ; i<sizeof(buf) ; i++){
-        //TTY::printk("%c", buf[i] == 0? ' ' : buf[i]);
+        TTY::printk("%d=%c\n", i, buf[i]);
     }
 
 

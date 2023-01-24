@@ -16,8 +16,13 @@ namespace ATA {
     };
 
     void init();
+    void identify(uint8 bus, uint8 drive);
+    void probe();
 
-    void readSects(uint32 lba, uint8 numSects, uint32* buffer);
+    void selectDrive(uint8 bus, uint8 i);
+
+    void readSects(uint32 lba, uint8 numSects, uint8* buffer);
+    void readSect(uint32 lba, uint8* buffer);
     void writeSects(uint32 lba, uint8 numSects, uint32* data);
 
     void waitBusy();
