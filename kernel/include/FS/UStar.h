@@ -3,9 +3,6 @@
 
 #include "Types.h"
 
-
-typedef void (*fileCallback)(uint8*);
-
 struct UStarRecord {
     char fileName[100];
     char mode[8];
@@ -24,6 +21,9 @@ struct UStarRecord {
     char devMin[8];
     char filePrefix[155];
 } __attribute__((__packed__));
+
+typedef void (*fileCallback)(UStarRecord*, uint32);
+
 
 class UStarFS {
 private:

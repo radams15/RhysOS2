@@ -10,6 +10,7 @@
 #include "Memory/malloc.h"
 #include "IO/ATA.h"
 #include "FS/UStar.h"
+#include "Math.h"
 
 
 bool init(){
@@ -45,9 +46,16 @@ extern "C" int kmain(){
     TTY::printk("Ustar record size: %d\n", sizeof(UStarRecord));
 
     UStarFS root(0);
-    root.fileList([](uint8* ptr){
-        UStarRecord* rec = (UStarRecord*) ptr;
-        TTY::printk("%s\n", rec->size);
+    root.fileList([](UStarRecord* rec, uint32 sectorStart){
+        int fileSize = oct2bin((uint8*) rec->size, 11);
+        int numSects = (fileSize/512)+1;
+
+        uint8 data[512*numSects];
+        ATA::readSects(sectorStart+1, numSects, (uint8*) data);
+
+        TTY::printk("File(%s) is %d sectors long\n", rec->fileName, numSects);
+
+        TTY::printk("%s\n", data);
     });
 
 

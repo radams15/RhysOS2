@@ -12,4 +12,6 @@ void hex_str(uint32 n, char* out);
 
 uint32 num_size(uint32 num);
 
+int oct2bin(unsigned char *str, int size);
+
 #endif //RHYSOS_MATH_H
