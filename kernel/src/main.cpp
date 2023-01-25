@@ -6,12 +6,8 @@
 #include "IO/Keyboard.h"
 #include "TextEdit.h"
 #include "IO/Serial.h"
-#include "Memory/Paging.h"
-#include "Memory/malloc.h"
 #include "IO/ATA.h"
 #include "FS/UStar.h"
-#include "Math.h"
-
 
 bool init(){
     GDT::init();
@@ -31,6 +27,14 @@ bool init(){
     return FALSE;
 }
 
+void dumpSectors(uint32 start, uint32 numSects){
+    uint8 data[512];
+
+    for(uint32 i=start ; i<start+numSects ; i++){
+        ATA::readSect(i, (uint8*) data);
+        TTY::printk("%s\n", data);
+    }
+}
 
 extern "C" int kmain(){
     int fail = init();
@@ -43,19 +47,12 @@ extern "C" int kmain(){
     Serial::write("Boot completed!\n");
     TTY::printk("Boot Complete!\n");
 
-    TTY::printk("Ustar record size: %d\n", sizeof(UStarRecord));
-
     UStarFS root(0);
     root.fileList([](UStarRecord* rec, uint32 sectorStart, uint32 numSects, uint32 fileSize){
-
-        uint8 data[512*numSects];
-        ATA::readSects(sectorStart+1, numSects, (uint8*) data);
-
         TTY::printk("File(%s) is %d sectors long\n", rec->fileName, numSects);
 
-        //TTY::printk("%s\n", data);
+        dumpSectors(sectorStart+1, numSects);
     });
-
 
     return 0;
 }

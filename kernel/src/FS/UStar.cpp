@@ -15,10 +15,7 @@ void UStarFS::fileList(fileCallback callback) {
     uint32 currentSector = sectorStart;
 
     ATA::readSect(currentSector, ptr);
-
     while (memcmp(ptr + 257, (uint8*) "ustar", 5) == 0) {
-        TTY::printk("Start sector %d\n", currentSector);
-
         UStarRecord* rec = (UStarRecord*) ptr;
 
         int fileSize = oct2bin((uint8*) rec->size, 11);
@@ -29,7 +26,5 @@ void UStarFS::fileList(fileCallback callback) {
         currentSector += numSects + 1; // Go past the file content and onto the next sector.
 
         ATA::readSect(currentSector, ptr);
-
-        TTY::printk("Go to sector %d\n", currentSector);
     }
 }
