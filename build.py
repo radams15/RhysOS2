@@ -1,7 +1,7 @@
 from os import system, mkdir, getcwd
 import subprocess
 from os.path import exists, splitext, isdir
-from shutil import copytree, rmtree
+from shutil import copytree, rmtree, copyfile
 import datetime
 from glob import glob
 from sys import platform
@@ -166,6 +166,20 @@ def make_iso(*elems):
         f.write(data)
 
     print("\n")
+
+    """
+    print("*** Make IMG ***")
+
+    copyfile('RhysOS.template', IMG_FILE)
+    run_cleanly(f'dd conv=notrunc if={bootloader} of={IMG_FILE}')
+    run_cleanly(f'hdiutil attach {IMG_FILE}')
+
+    for elem in elems:
+        run_cleanly(f'cp {elem} /Volumes/BOOTFS/')
+
+    run_cleanly('hdiutil detach /Volumes/BOOTFS')
+
+    print("\n")"""
 
 
 def run_qemu():

@@ -8,6 +8,7 @@
 #include "IO/Serial.h"
 #include "IO/ATA.h"
 #include "FS/UStar.h"
+#include "libc/Syscall.h"
 
 bool init(){
     GDT::init();
@@ -19,6 +20,8 @@ bool init(){
 
     Keyboard::init();
     ATA::init();
+
+    Syscall::init();
 
     IDT::enable();
 
@@ -36,6 +39,8 @@ void dumpSectors(uint32 start, uint32 numSects){
     }
 }
 
+extern "C" void test();
+
 extern "C" int kmain(){
     int fail = init();
 
@@ -47,12 +52,14 @@ extern "C" int kmain(){
     Serial::write("Boot completed!\n");
     TTY::printk("Boot Complete!\n");
 
-    UStarFS root(0);
-    root.fileList([](UStarRecord* rec, uint32 sectorStart, uint32 numSects, uint32 fileSize){
-        TTY::printk("File(%s) is %d sectors long\n", rec->fileName, numSects);
+    test();
 
-        dumpSectors(sectorStart+1, numSects);
-    });
+    /*UStarFS root(0);
+    root.fileList([](UStarRecord* rec, uint32 sectorStart, uint32 numSects, uint32 fileSize){
+        TTY::printk("File(%s) is %d sectors long (%d)\n", rec->fileName, numSects, rec->type);
+
+        //dumpSectors(sectorStart+1, numSects);
+    });*/
 
     return 0;
 }

@@ -71,6 +71,7 @@ extern "C" void  isr28();
 extern "C" void  isr29();
 extern "C" void  isr30();
 extern "C" void  isr31();
+extern "C" void  isr128();
 
 extern "C" void  irq0();
 extern "C" void  irq1();

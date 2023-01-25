@@ -4,7 +4,7 @@ jmp boot
 
 TIMES 3-($-$$) DB 0x90   ; Support 2 or 3 byte encoded JMPs before BPB.
 
-OEMname:           db    "mkfs.fat"  ; mkfs.fat is what OEMname mkdosfs uses
+OEMname:           db    "RHYSOS  "  ; mkfs.fat is what OEMname mkdosfs uses
 bytesPerSector:    dw    512
 sectPerCluster:    db    1
 reservedSectors:   dw    1
@@ -19,9 +19,9 @@ numHiddenSectors:  dd    0
 numSectorsHuge:    dd    0
 driveNum:          db    0
 reserved:          db    0
-signature:         db    0x29
-volumeID:          dd    0x2d7e5a1a
-volumeLabel:       db    "RhysOS     "
+signature:         db    41
+volumeID:          dd    00000000h
+volumeLabel:       db    "BOOTFS     "
 fileSysType:       db    "FAT12   "
 
 boot:
@@ -35,15 +35,11 @@ boot:
 
     call load_kernel
 
-%ifdef VIDEO
-    call set_video_mode
-%endif
     call set_protected_mode
 
     jmp $
 
 %include "bprint.nasm"
-%include "video_mode.nasm"
 %include "disk/floppy.nasm"
 %include "disk/hdd.nasm"
 %include "gdt.nasm"

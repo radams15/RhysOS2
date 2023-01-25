@@ -59,6 +59,7 @@ void IDT::init() {
     setGate(29, (uint32)isr29 , 0x08, 0x8E);
     setGate(30, (uint32)isr30 , 0x08, 0x8E);
     setGate(31, (uint32)isr31 , 0x08, 0x8E);
+    setGate(128, (uint32)isr128 , 0x08, 0x8E); // int 0x80 - syscall
 
 
     Ports::outb(0x20, 0x11);
@@ -88,7 +89,6 @@ void IDT::init() {
     setGate(44, (uint32)irq12, 0x08, 0x8E);
     setGate(45, (uint32)irq13, 0x08, 0x8E);
     setGate(46, (uint32)irq14, 0x08, 0x8E);
-
 
     idt_flush((uint32) &ptr);
 }
