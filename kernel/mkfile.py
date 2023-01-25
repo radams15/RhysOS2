@@ -34,7 +34,7 @@ header = path.join(INC, *dirs, f"{file_name}.h")
 
 if not path.exists(source) and not path.exists(header):
 	with open(source, "w") as f:
-		f.write("#include <{}>".format(path.join(*dirs, f"{file_name}.h")))
+		f.write("#include \"{}\"".format(path.join(*dirs, f"{file_name}.h")))
 
 	with open(header, "w") as f:
 		f.write("#ifndef RHYSOS_{}_H\n#define RHYSOS_{}_H\n\n\n\n#endif //RHYSOS_{}_H".format(file_name.upper(), file_name.upper(), file_name.upper()))

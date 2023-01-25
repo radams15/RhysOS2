@@ -42,7 +42,8 @@ void hex_str(uint32 n, char* out){
     }
 
     int16 index=0;
-    out[0] = '0';
+
+    /*out[0] = '0';
     out[1] = 'x';
     for(int16 x=length-1 ; x>=0 ; x--){
         out[index+2] = buf[x];
@@ -50,7 +51,14 @@ void hex_str(uint32 n, char* out){
         index++;
     }
 
-    out[length+2] = NULL;
+    out[length+2] = NULL;*/
+
+    for(int16 x=length-1 ; x>=0 ; x--){
+        out[index] = buf[x];
+
+        index++;
+    }
+    out[length] = NULL;
 }
 
 uint32 num_size(uint32 num) {

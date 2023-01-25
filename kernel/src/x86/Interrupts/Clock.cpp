@@ -37,7 +37,7 @@ void Clock::clockTick() {
 }
 
 void Clock::sleep(uint32 secs) {
-    uint32 target = frequency*secs;
+    uint32 target = tick + (frequency*secs);
 
     while(tick < target){
         // Wait

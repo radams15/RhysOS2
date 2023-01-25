@@ -4,6 +4,7 @@
 #include "Interrupts/ISR.h"
 #include "IO/TTY.h"
 #include "Panic.h"
+#include "Interrupts/Clock.h"
 
 #define ATA_PRIMARY_IO 0x1F0
 #define ATA_SECONDARY_IO 0x170
@@ -137,7 +138,7 @@ void ATA::readSect(unsigned int lba, uint8 *buffer) {
     waitBusy();
     waitDrq();
 
-    for(int i=0 ; i<20 ; i+=2) { // 256
+    for(int i=0 ; i<512 ; i+=2) {
         uint16 data = Ports::inw(ATA_PRIMARY_IO + ATA_REG_DATA);
 
         uint8 a, b;

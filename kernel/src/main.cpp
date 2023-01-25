@@ -9,6 +9,7 @@
 #include "Memory/Paging.h"
 #include "Memory/malloc.h"
 #include "IO/ATA.h"
+#include "FS/UStar.h"
 
 
 bool init(){
@@ -41,11 +42,13 @@ extern "C" int kmain(){
     Serial::write("Boot completed!\n");
     TTY::printk("Boot Complete!\n");
 
-    uint8 buf[256];
-    ATA::readSect(0, buf);
-    for(uint16 i=0 ; i<16 ; i++){
-        TTY::printk("%x\n", buf[i]);
-    }
+    TTY::printk("Ustar record size: %d\n", sizeof(UStarRecord));
+
+    UStarFS root(0);
+    root.fileList([](uint8* ptr){
+        UStarRecord* rec = (UStarRecord*) ptr;
+        TTY::printk("%s\n", rec->size);
+    });
 
 
     return 0;

@@ -20,3 +20,21 @@ void memcpy(uint8 *dest, uint8* src, uint32 len) {
 
     for ( ; len != 0; len--) *new_dest++ = *new_src++;
 }
+
+int8 memcmp(unsigned char *cs, unsigned char *ct, unsigned int n) {
+    uint32 i;
+
+    for (i = 0; i < n; i++, cs++, ct++)
+    {
+        if (*cs < *ct)
+        {
+            return -1;
+        }
+        else if (*cs > *ct)
+        {
+            return 1;
+        }
+    }
+
+    return 0;
+}
