@@ -22,15 +22,15 @@ struct UStarRecord {
     char filePrefix[155];
 } __attribute__((__packed__));
 
-typedef void (*fileCallback)(UStarRecord*, uint32);
+typedef void (*fileCallback)(UStarRecord*, uint32, uint32, uint32);
 
 
 class UStarFS {
 private:
-    uint32 lbaStart;
+    uint32 sectorStart;
 
 public:
-    explicit UStarFS(uint32 lbaStart);
+    explicit UStarFS(uint32 sectorStart);
 
     void fileList(fileCallback callback);
 };

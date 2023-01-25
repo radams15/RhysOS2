@@ -5,3 +5,8 @@ build/
 *.o
 /cmake-build-debug/
 /cross/*
+/root/
+disk.tar
+peda-session-*
+kernel_log.txt
+.gdb_history
