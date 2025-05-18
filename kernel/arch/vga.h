@@ -2,8 +2,10 @@
 #define TTY_H
 
 #define VGA_MEM 0xB8000
+#define VGA_COL 80
+#define VGA_ROW 25
 
-enum vga_color {
+enum vga_colour {
     VGA_COLOUR_BLACK = 0,
     VGA_COLOUR_BLUE = 1,
     VGA_COLOUR_GREEN = 2,
@@ -23,8 +25,10 @@ enum vga_color {
 };
 
 void vga_init();
-void vga_putc(int row, int col, int fg, int bg, char c);
-int vga_getcols();
-int vga_getrows();
+void vga_setc(char c, int row, int col);
+
+void vga_putc(char c);
+void vga_scroll(int n);
+void vga_clear();
 
 #endif

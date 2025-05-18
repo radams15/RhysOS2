@@ -1,8 +1,14 @@
 #include <arch/vga.h>
 
 int kmain() {
+    vga_init();
 
-    vga_putc(2, 2, 0, 15, 'A');
+    for(int i=0 ; i<30 ; i++) {
+
+        for(int c='A' ; c<0xFF ; c++) {
+            vga_putc(c);
+        }
+    }
 
     while(1) {
 
