@@ -5,6 +5,8 @@ extern code
 extern bss
 extern mem_end
 
+extern _kmain
+
 MBALIGN:  equ 1<<0
 MEMINFO:  equ 1<<1
 VIDMODE:  equ 4h
@@ -32,4 +34,5 @@ mboot:
 _start: 
     push ebx
     cli
+    call _kmain
     jmp $
