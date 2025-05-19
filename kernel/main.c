@@ -1,5 +1,8 @@
 #include <arch/vga.h>
 #include <fs/fs.h>
+#include <tty.h>
+
+int stdin, stdout, stderr;
 
 int kmain() {
     vga_init();
@@ -8,13 +11,9 @@ int kmain() {
 
     fs_root = devfs_init();
 
-    int stdout = open("stdout", O_WRONLY);
+    stdout = open("stdout", O_WRONLY);
 
-    write(stdout, "test", 5);
-
-    while(1) {
-
-    }
+    printf("Hello world '%x'\n", 0x12345);
 
     close(stdout);
 
