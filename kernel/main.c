@@ -3,12 +3,7 @@
 int kmain() {
     vga_init();
 
-    for(int i=0 ; i<30 ; i++) {
-
-        for(int c='A' ; c<0xFF ; c++) {
-            vga_putc(c);
-        }
-    }
+    vga_print("Boot starting...\n");
 
     while(1) {
 

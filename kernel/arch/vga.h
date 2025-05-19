@@ -30,5 +30,6 @@ void vga_setc(char c, int row, int col);
 void vga_putc(char c);
 void vga_scroll(int n);
 void vga_clear();
+void vga_print(char* str);
 
 #endif

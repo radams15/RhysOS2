@@ -35,8 +35,6 @@ void vga_setc(char c, int row, int col) {
 }
 
 void vga_scroll(int n) {
-    /* vga_clear(); */
-
     for(int r=n ; r<VGA_ROW ; r++) {
         for(int c=0 ; c<VGA_COL ; c++) {
             mem[(r-1) * VGA_COL + c] = mem[r * VGA_COL + c]; // Copy to line above
@@ -79,5 +77,11 @@ void vga_putc(char c) {
     if(row == VGA_ROW) {
         vga_scroll(1);
         col = 0;
+    }
+}
+
+void vga_print(char* str) {
+    for(char* c=str ; *c != 0 ; c++) {
+        vga_putc(*c);
     }
 }
