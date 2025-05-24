@@ -6,6 +6,8 @@
 
 int stdin, stdout, stderr;
 
+extern char* mem_end;
+
 void panic(const char* msg) {
     vga_print(msg);
     for(;;){}
@@ -24,26 +26,7 @@ int kmain(multiboot_info_t* mbd, uint32 mb_magic) {
 
     stdout = open("stdout", O_WRONLY);
 
-    char* mem_start = 0x1000000;
-    int mem_len = 0x3EE00000;
-
-    /* int i; */
-    /* for(i = 0; i < mbd->mmap_length;  */
-    /*     i += sizeof(multiboot_memory_map_t)) { */
-    /*     multiboot_memory_map_t* mmmt =  */
-    /*         (multiboot_memory_map_t*) (mbd->mmap_addr + i); */
-    /*  */
-    /*  */
-    /*  */
-    /*     if(mmmt->type == MULTIBOOT_MEMORY_AVAILABLE) { */
-    /*         printf("Start Addr: %x,%xh | Length: %x,%xh\n", */
-    /*             mmmt->addr_low, mmmt->addr_high, mmmt->len_low, mmmt->len_high); */
-    /*  */
-    /*     } */
-    /* } */
-    
-
-    mem_phys_init(mem_start, mem_len);
+    mem_phys_init(mem_end, 0x100000);
 
     close(stdout);
 
