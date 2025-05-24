@@ -32,6 +32,7 @@ mboot:
     dd 32
 
 _start: 
+    push eax ; push multiboot data and magic
     push ebx
     cli
     call _kmain
